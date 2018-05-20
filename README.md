@@ -1,5 +1,7 @@
+<img src="https://github.com/ajino2k/IPSec-VPN/blob/master/techspacekh_l2lvpn_1.png" />
 # IPSec-VPN
 - IPSec – Internet Protocol security: là giao thức cung cấp những kỹ thuật để bảo vệ dữ liệu, sao cho dữ liệu được truyền đi an toàn từ nơi này sang nơi khác. IPSec VPN là sự kết hợp để tạo ra một mạng riêng an toàn phục vụ cho việc truyền dữ liệu bảo mật
+
 
 - IPSec hoạt động ở lớp Network, nó không phụ thuộc vào lớp Data-Link như các giao thức dùng trong VPN khác như L2TP, PPTP.-
 
@@ -96,3 +98,33 @@ ACL Mo port 500 udp va 4500 tcp/udp va protocol 50,51 den server VNM va nguoc la
  ```yum install libreswan.x86_64```
 
 #### Config IPSEC connect VNM
+### 1 . vim /etc/ipsec.conf
+config	| note
+------------ | -------------
+conn VNM-VPN-ABC                  |           ## name connect
+left=xxx.xxx.xx.x                 |           ## IP public ABC
+leftsubnet=xx.xxx.xx.x/32         |           ## IP private ABC
+right=202.172.4.16                |           ## IP Public VNM
+rightid=10.32.254.168             |           ## Range IP VNM
+rightsubnet=10.8.2.101/32         |   	     ## IP private VNM
+authby=secret                     |           ## Giu nguyen
+auto=start                        |           ##
+pfs=yes                           |           ##   
+type=tunnel                       |           ##
+priority=1                        |           ##
+ike=aes128-sha1;modp1024          |  	     ##
+esp=3des;modp1024                 |           ##
+
+### 2 . vim /etc/ipsec.secrets
+
+```xxx.xxx.x.xx %any: PSK "VNM092ABC" | ## IP public VNM + key VNM gui```
+
+### 3 . Route private VNM ve private ABC
+```ip r a 10.8.2.101 via xx.x.x.1 dev em2```
+
+#### 4 . Command show status IPSEC
+```/etc/init.d/ipsec start ```
+</br>
+ipsec auto status 
+</br>
+IPsec connections: loaded 1, active 1
